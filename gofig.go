@@ -37,7 +37,7 @@ func (this *Gofig) Read(provider Provider) error {
 
 	src, err := provider.Source()
 
-	if err != nil {
+	if src == nil || err != nil {
 		return err
 	}
 

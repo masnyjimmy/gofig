@@ -1,4 +1,4 @@
-package yaml
+package file
 
 import (
 	"github.com/masnyjimmy/gofig"

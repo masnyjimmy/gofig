@@ -31,14 +31,27 @@ func (this *Gofig) AddTimeFormats(formats ...string) {
 	this.TimeFormats = append(this.TimeFormats, formats...)
 }
 
-func (this *Gofig) Read(src Source) {
+func (this *Gofig) Read(provider Provider) error {
+
+	src, err := provider.Source()
+
+	if err != nil {
+		return err
+	}
+
 	for _, path := range this.Fields {
-		value := src.Read(path)
+		value, err := src.Read(path)
+
+		if err != nil {
+			return err
+		}
 
 		if value != nil {
 			this.Records[path] = value
 		}
 	}
+
+	return nil
 }
 
 func (this *Gofig) applyRecords(dest reflect.Value, path string) error {

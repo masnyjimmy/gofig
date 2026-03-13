@@ -1,6 +1,7 @@
 package file
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -54,7 +55,7 @@ func (p *Provider) Source() (gofig.Source, error) {
 		data, err := os.ReadFile(file)
 
 		if err != nil {
-			if err == os.ErrNotExist {
+			if errors.Is(err, os.ErrNotExist) {
 				continue
 			}
 			return nil, err

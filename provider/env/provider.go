@@ -9,6 +9,10 @@ type Provider struct {
 	prefix          string
 }
 
+func New() *Provider {
+	return new(Provider)
+}
+
 func (p *Provider) SetPathTransformer(fn PathTranformFn) *Provider {
 	p.pathTransformFn = fn
 	return p

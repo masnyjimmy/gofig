@@ -4,5 +4,5 @@ go 1.25.4
 
 require (
 	github.com/goccy/go-yaml v1.19.2
-	github.com/masnyjimmy/gofig v1.2.0
+	github.com/masnyjimmy/gofig v1.2.1
 )

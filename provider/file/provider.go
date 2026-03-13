@@ -12,7 +12,7 @@ type ParserFn = func(data []byte) (gofig.Records, error)
 
 func getDefaultParser(ext string) (ParserFn, error) {
 	switch ext {
-	case "yaml":
+	case ".yaml":
 		return parseYAML, nil
 	default:
 		return nil, fmt.Errorf("Unsupported ext: %v", ext)

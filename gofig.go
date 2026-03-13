@@ -1,6 +1,7 @@
 package gofig
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"time"
@@ -11,9 +12,10 @@ const LABEL = "conf"
 type Records = map[string]any
 
 type Gofig struct {
-	Fields      Fields
-	Records     Records
-	TimeFormats []string
+	Fields        Fields
+	Records       Records
+	TimeFormats   []string
+	MissingValues []string
 }
 
 func New(fields Fields) *Gofig {
@@ -54,6 +56,14 @@ func (this *Gofig) Read(provider Provider) error {
 	return nil
 }
 
+type NoValuesError struct {
+	MissingValues []string
+}
+
+func (this *NoValuesError) Error() string {
+	return fmt.Sprintf("Missing values: %v", this.MissingValues)
+}
+
 func (this *Gofig) applyRecords(dest reflect.Value, path string) error {
 
 	t := dest.Type()
@@ -89,7 +99,7 @@ func (this *Gofig) applyRecords(dest reflect.Value, path string) error {
 					return fmt.Errorf("Unable to apply value: %w", err)
 				}
 			} else if fInfo.Required {
-				return fmt.Errorf("Missing required value: %v", name)
+				this.MissingValues = append(this.MissingValues, currentPath)
 			} else {
 				if err := this.applyValue(dest.Field(idx), fInfo.Default); err != nil {
 					return fmt.Errorf("Unable to apply value: %w", err)
@@ -103,6 +113,12 @@ func (this *Gofig) applyRecords(dest reflect.Value, path string) error {
 
 func (this *Gofig) Unmarshall(dest any) error {
 	root := reflect.ValueOf(dest)
+	this.MissingValues = make([]string, 0)
+	err := this.applyRecords(root.Elem(), "")
 
-	return this.applyRecords(root.Elem(), "")
+	if len(this.MissingValues) != 0 {
+		return errors.Join(&NoValuesError{this.MissingValues}, err)
+	}
+
+	return err
 }
